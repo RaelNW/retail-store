@@ -24,7 +24,7 @@ This repository is dedicated to developing the backend infrastructure for an int
 
 ## Installation
 
-1. Clone the repository: `git clone [repository-url]`
+1. Clone the repository: `git clone https://github.com/RaelNW/retail-store.git`
 2. Navigate to the project directory:
 3. Install dependencies: `npm install`
 4. Set up the MySQL database using the provided schema file.
@@ -48,3 +48,9 @@ This repository is dedicated to developing the backend infrastructure for an int
 For inquiries, please contact [Rael Wanjala].
 
 ## link to Demo
+
+https://drive.google.com/file/d/12yDisc3gEx2Gy5fUU6k6V_GD2c9BZxuy/view?usp=sharing
+
+## Link to Repo
+
+https://github.com/RaelNW/retail-store.git
