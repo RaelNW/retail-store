@@ -34,7 +34,7 @@ Product.init(
       },
     },
     category_id: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.INTEGER,
       references: {
         model: "category",
         key: "id",

@@ -11,15 +11,14 @@ router.get("/", async (req, res) => {
       include: [
         {
           model: Category,
+          attributes: ["id", "category_name"],
         },
         {
           model: Tag,
+          attributes: ["id", "tag_name"],
         },
       ],
     });
-    if (productData.length === 0) {
-      return res.status(404).json({ error: "Product not found" });
-    }
     // Send the product as a JSON response
     res.status(200).json(productData);
   } catch (error) {
@@ -37,14 +36,17 @@ router.get("/:id", async (req, res) => {
       include: [
         {
           model: Category,
+          attributes: ["id", "category_name"],
         },
         {
           model: Tag,
+          attributes: ["id", "tag_name"],
         },
       ],
     });
     if (!productData) {
-      return res.status(404).json({ error: "Product not found" });
+      res.status(404).json({ error: "Product not found" });
+      return;
     }
     // Send the product as a JSON response
     res.status(200).json(productData);
@@ -56,36 +58,33 @@ router.get("/:id", async (req, res) => {
 });
 
 // create new product
-router.post("/", async (req, res) => {
-  try {
-    // Create a new product using the data from req.body
-    const newProduct = await Product.create({
-      product_name: req.body.product_name,
-      price: req.body.price,
-      stock: req.body.stock,
+router.post("/", (req, res) => {
+  Product.create(req.body)
+    .then((newProduct) => {
+      // Check if there are any product tags in the request body
+      if (req.body.tagIds.length) {
+        // Create product-tag associations for each tag ID
+        const productTagIdArr = req.body.tagIds.map((tag_id) => {
+          return {
+            product_id: newProduct.id,
+            tag_id,
+          };
+        });
+
+        // Bulk create the product-tag associations in the ProductTag model
+        return ProductTag.bulkCreate(productTagIdArr);
+      }
+
+      // Respond with a 200 status code (Created) and send the newly created product as JSON
+      res.status(200).json(newProduct);
+    })
+    .catch((error) => {
+      // Handle any errors that occur during the database operation
+      console.error(error);
+
+      // Respond with a 500 status code (Internal Server Error) and a custom error message
+      res.status(400).json({ error: "Oh, oh, something's up!" });
     });
-
-    // Check if there are any product tags in the request body
-    if (req.body.tagIds.length > 0) {
-      // Create product-tag associations for each tag ID
-      const productTagIdArr = req.body.tagIds.map((tag_id) => ({
-        product_id: newProduct.id,
-        tag_id,
-      }));
-
-      // Bulk create the product-tag associations in the ProductTag model
-      await ProductTag.bulkCreate(productTagIdArr);
-    }
-
-    // Respond with a 201 status code (Created) and send the newly created product as JSON
-    res.status(201).json(newProduct);
-  } catch (error) {
-    // Handle any errors that occur during the database operation
-    console.error(error);
-
-    // Respond with a 500 status code (Internal Server Error) and a custom error message
-    res.status(500).json({ error: "Oh, oh, something's up!" });
-  }
 });
 
 /* req.body should look like this...
